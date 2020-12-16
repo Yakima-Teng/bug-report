@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页</title>
+    <script>
+        var startTime = +new Date // 测试时间起点，实际统计起点为 DNS 查询
+    </script>
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous"></script>
+    <script>
+        var endTime = +new Date; //时间终点
+        var headTime = endTime - startTime; //头部资源加载时间，头部资源加载完毕后才会加载页面主要内容
+        console.log(headTime)
+    </script>
+</head>
+
+<body>
+    <script>
+        $.ajax({ url: 'https://www.baidu.com' })
+    </script>
+    <script src="../client/bug-report.js"></script>
+    <script>
+        void (function () {
+            function getString (val) {
+                if (val === 0) { return '0' }
+                return val ? ('' + val) : ''
+            }
+            var queryString = (function () {
+                var queryObj = {
+                    ht: 'headTime' in window ? window.headTime  : '',
+                    pid: window.pageId,
+                    ts: new Date().getTime(),
+                }
+                var tempArr = []
+                Object.keys(queryObj).forEach(function (key) {
+                    tempArr.push('' + key + '=' + getString(queryObj[key]))
+                })
+                return tempArr.join('&')
+            })()
+
+            var reportUrl = 'bug-report.gif?' + queryString
+
+            function loadScript(url, apikey) {
+                var script = document.createElement('script')
+                script.type = 'text/javascript'
+                script.src = url
+                script.setAttribute('apikey', apikey)
+                document.body.appendChild(script)
+            }
+
+            loadScript(reportUrl, 'API-KEY')
+        })()
+    </script>
+</body>
+
+</html>
